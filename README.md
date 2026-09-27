@@ -1,82 +1,82 @@
-#  Systèmes Biométriques de Reconnaissance Faciale
+# 🔍 Facial Recognition — Biometric Systems
 
 **UV SAFE — IMT Nord Europe**  
 Yanis Ghazi · Amar Lassal  
-Encadrante : Pauline Puteaux, LIRMM CNRS
+Supervisor: Pauline Puteaux, LIRMM CNRS
 
 ---
 
-##  Présentation
+## Overview
 
-Ce projet compare trois approches de reconnaissance faciale, des méthodes classiques au deep learning :
+This project compares three face recognition approaches, from classical methods to deep learning:
 
-| Méthode | Dataset | Accuracy | Erreurs |
+| Method | Dataset | Accuracy | Errors |
 |---|---|---|---|
-| **LBPH + Chi²** | AT&T (40 sujets, 400 imgs) | 90.0% | 8/80 |
-| **Eigenfaces + SVM** | AT&T (40 sujets, 400 imgs) | 96.25% | 3/80 |
-| **FaceNet + SVM** | LFW (1140 identités, 3000+ imgs) | 98.61% | 12/865 |
+| **LBPH + Chi²** | AT&T (40 subjects, 400 imgs) | 90.0% | 8/80 |
+| **Eigenfaces + SVM** | AT&T (40 subjects, 400 imgs) | 96.25% | 3/80 |
+| **FaceNet + SVM** | LFW (1140 identities, 3000+ imgs) | 98.61% | 12/865 |
 
 ---
 
-##  Structure du projet
+## Project Structure
 
 ```
 ├── notebooks/
-│   ├── 01_LBPH_Eigenfaces_ATT.ipynb   # Méthodes classiques sur AT&T
-│   └── 02_FaceNet_LFW.ipynb           # Deep learning sur LFW
+│   ├── 01_LBPH_Eigenfaces_ATT.ipynb   # Classical methods on AT&T
+│   └── 02_FaceNet_LFW.ipynb           # Deep learning on LFW
 └── README.md
 ```
 
 ---
 
-##  Méthodes
+## Methods
 
 ### 1. LBPH (Local Binary Patterns Histograms)
-- Pour chaque pixel, compare ses voisins → code binaire local
-- Découpe l'image en blocs → histogramme LBP par bloc → vecteur descripteur
-- Classification par **distance Chi²** (nearest neighbour)
-- Hyperparamètre clé : `block_size=8` (optimal), distance Chi² > Euclidienne > KL
-- **Macro AUC = 0.967**, sans aucun entraînement supervisé
+- For each pixel, compares its neighbours → local binary code
+- Splits the image into blocks → LBP histogram per block → descriptor vector
+- Classification via **Chi² distance** (nearest neighbour)
+- Key hyperparameter: `block_size=8` (optimal), Chi² > Euclidean > KL
+- **Macro AUC = 0.967**, with no supervised training
 
 ### 2. Eigenfaces + SVM
-- Aplatissement 92×112px → vecteur 10 304 dimensions
-- **PCA (20 composantes)** → 70.5% de variance conservée, 10 304 → 20 dims
-- Classificateur **SVM RBF** (`C=10`, `γ=scale`, `whiten=True`)
-- Sensible à l'éclairage global, nécessite alignement facial
-- Temps d'inférence : ~0.006 s
+- Flatten 92×112px image → 10,304-dimensional vector
+- **PCA (20 components)** → 70.5% variance retained, 10,304 → 20 dims
+- **RBF SVM** classifier (`C=10`, `γ=scale`, `whiten=True`)
+- Sensitive to global lighting, requires facial alignment
+- Inference time: ~0.006 s
 
 ### 3. FaceNet (Google, 2015)
-- Architecture **InceptionResNet** pré-entraîné sur VGGFace2 (3.3M images, 9131 identités)
-- Détection + alignement par **MTCNN**
-- Embedding 512D + **SVM linéaire**
-- Triplet loss : images du même individu proches, individus différents éloignés
-- Les erreurs se concentrent sur les faibles scores de confiance (< 0.5)
+- **InceptionResNet** architecture pre-trained on VGGFace2 (3.3M images, 9,131 identities)
+- Detection + alignment via **MTCNN**
+- 512D embedding + **linear SVM**
+- Triplet loss: same-person images pulled together, different-person images pushed apart
+- Errors concentrate around low confidence scores (< 0.5)
 
 ---
 
-##  Datasets
+## Datasets
 
 ### AT&T Database of Faces
-- 400 images · 40 sujets × 10 images
-- Résolution 92×112px, format PGM, 256 niveaux de gris
-- Split : **8 train / 2 test** par sujet
-- Variations : pose, éclairage, expression, lunettes, temps
+- 400 images · 40 subjects × 10 images
+- Resolution 92×112px, PGM format, 256 grayscale levels
+- Split: **8 train / 2 test** per subject
+- Variations: pose, lighting, expression, glasses, time
 - [Kaggle](https://www.kaggle.com/datasets/kasikrit/att-database-of-faces)
 
 ### LFW (Labeled Faces in the Wild)
-- ~13 000 images · 5 000+ personnes (photos web non contrôlées)
-- Sous-ensemble filtré : 1 140 individus, 3 000+ images (≥10 imgs/personne)
+- ~13,000 images · 5,000+ people (uncontrolled web photos)
+- Filtered subset: 1,140 individuals, 3,000+ images (≥10 imgs/person)
 - [Kaggle](https://www.kaggle.com/datasets/jessicali9530/lfw-dataset)
 
 ---
 
-##  Installation
+## Installation
 
 ```bash
 pip install numpy pillow matplotlib seaborn pandas scikit-learn scikit-image
 ```
 
-Pour le notebook FaceNet (GPU recommandé) :
+For the FaceNet notebook (GPU recommended):
 
 ```bash
 pip install torch facenet-pytorch
@@ -84,28 +84,28 @@ pip install torch facenet-pytorch
 
 ---
 
-##  Utilisation
+## Usage
 
-Les notebooks sont conçus pour tourner sur **Kaggle** avec les datasets correspondants.
+The notebooks are designed to run on **Kaggle** with the corresponding datasets.
 
-1. Importer le dataset sur Kaggle
-2. Ouvrir le notebook correspondant
+1. Import the dataset on Kaggle
+2. Open the corresponding notebook
 3. *Run All*
 
 ---
 
-##  Résultats clés
+## Key Results
 
-- **Erreurs communes** aux deux méthodes classiques : sujets S5, S10, S28 — ambiguïté visuelle intrinsèque que ni LBPH ni Eigenfaces ne parviennent à lever
-- **FaceNet** atteint 98.61% sur LFW, un dataset nettement plus difficile qu'AT&T, sans ré-entraînement du réseau (transfert learning)
-- Un mécanisme de **rejet par seuil de confiance** (score SVM < 0.5) permettrait d'éliminer la majorité des faux positifs FaceNet
+- **Shared errors** across both classical methods: subjects S5, S10, S28 — intrinsic visual ambiguity that neither LBPH nor Eigenfaces can resolve
+- **FaceNet** reaches 98.61% on LFW, a significantly harder dataset than AT&T, with no network retraining (transfer learning)
+- A **confidence-based rejection mechanism** (SVM score < 0.5) would eliminate most FaceNet false positives
 
 ---
 
-##  Références
+## References
 
 - Samaria & Harter (1994) — AT&T Database of Faces
 - Turk & Pentland (1991) — Eigenfaces for Recognition
 - Ojala et al. (2002) — Local Binary Patterns
 - Schroff et al. (2015) — FaceNet
-- Deng et al. (2019) — ArcFace (état de l'art : 99.8% LFW)
+- Deng et al. (2019) — ArcFace (state of the art: 99.8% LFW)
